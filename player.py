@@ -2,10 +2,10 @@ import requests
 import json
 import time
 
-jason_prince_api_key = "Token ece07b1e0e2fc9e8a6c86ae269422e9afb9de66d"
+jason_clemons_api_key = "Token 25064e5e6056d2c785295da3e30c023b138b70db"
 
 headers = {
-    'Authorization': jason_prince_api_key,
+    'Authorization': jason_clemons_api_key,
     'Content-Type': 'application/json'
 }
 
@@ -19,7 +19,11 @@ class Player:
         res = requests.get(
             'https://lambda-treasure-hunt.herokuapp.com/api/adv/init/', headers=headers
         )
-        print(res.text)
+        res = res.text
+        data = json.loads(res)
+        print(f'type of: {type(data)}')
+        print(data['room_id'])
+
 
 #---------------------------TREASURE---------------------------#
 
@@ -86,6 +90,6 @@ class Player:
         print(f'{next_room} Here is our new room.')
 
 
-jason = Player("Jason", 0)
+phade = Player("Phade", 0)
 
-jason.sell_confirm()
+phade.init()
