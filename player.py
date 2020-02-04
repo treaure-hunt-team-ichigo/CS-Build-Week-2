@@ -23,7 +23,12 @@ class Player:
 
 #---------------------------TREASURE---------------------------#
 
-    # def take(self):
+    def take(self):
+        data = {"name": "treasure"}
+        res = requests.post(
+            'https://lambda-treasure-hunt.herokuapp.com/api/adv/take/', headers=headers, data=json.dumps(data)
+        )
+        print(f'------- {res.text} TAKING TREASURE')
 
     def drop(self):
         data = {"name": "treasure"}
@@ -32,9 +37,14 @@ class Player:
         )
         print(f'------- {res.text} DROPPING TREASURE')
 
-    # def sell(self):
+    def sell(self):
+        data = {"name": "treasure"}
+        res = requests.post(
+            'https://lambda-treasure-hunt.herokuapp.com/api/adv/sell/', headers=headers, data=json.dumps(data)
+        )
+        print(f'------- {res.text} SELL TREASURE')
 
-        #---------------------------MOVE---------------------------#
+#---------------------------MOVE---------------------------#
 
     def move(self, direction):
         print("Direction", direction)
@@ -71,4 +81,4 @@ class Player:
 
 jason = Player("Jason", 0)
 
-jason.wise_move('s', 0)
+jason.sell()
