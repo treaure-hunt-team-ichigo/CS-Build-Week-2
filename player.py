@@ -14,89 +14,105 @@ class Player:
     def __init__(self, name, starting_room):
         self.name = name
         self.current_room = starting_room
+        self.base_url = "https://lambda-treasure-hunt.herokuapp.com/api"
 
+#---------------------------INIT---------------------------#
     def init(self):
+        endpoint = "/adv/init/"
         res = requests.get(
-            'https://lambda-treasure-hunt.herokuapp.com/api/adv/init/', headers=headers
+            self.base_url + endpoint,
+            headers=headers
         )
         print(res.text)
 
 #---------------------------TREASURE---------------------------#
     def take(self):
-        data = {"name": "treasure"}
+        endpoint = "/adv/take/"
+        data = {
+            "name": "treasure"
+        }
         res = requests.post(
-            'https://lambda-treasure-hunt.herokuapp.com/api/adv/take/', headers=headers, data=json.dumps(data)
+            self.base_url + endpoint,
+            headers=headers,
+            data=json.dumps(data)
         )
         print(f'------- {res.text} TAKING TREASURE')
 
     def drop(self):
-        data = {"name": "treasure"}
+        endpoint = "/adv/drop/"
+        data = {
+            "name": "treasure"
+        }
         res = requests.post(
-            'https://lambda-treasure-hunt.herokuapp.com/api/adv/drop/', headers=headers, data=json.dumps(data)
+            self.base_url + endpoint,
+            headers=headers,
+            data=json.dumps(data)
         )
         print(f'------- {res.text} DROPPING TREASURE')
 
     def sell(self):
+        endpoint = "/adv/sell/"
         data = {"name": "treasure"}
         res = requests.post(
-            'https://lambda-treasure-hunt.herokuapp.com/api/adv/sell/', headers=headers, data=json.dumps(data)
+            self.base_url + endpoint,
+            headers=headers,
+            data=json.dumps(data)
         )
         print(f'------- {res.text} SELL TREASURE')
 
     def sell_confirm(self):
+        endpoint = "/adv/sell/"
         data = {"name": "treasure", "confirm": "yes"}
         res = requests.post(
-            'https://lambda-treasure-hunt.herokuapp.com/api/adv/sell/', headers=headers, data=json.dumps(data)
+            self.base_url + endpoint,
+            headers=headers,
+            data=json.dumps(data)
         )
         print(f'------- {res.text} SELL CONFIRM TREASURE')
 
 #---------------------------MOVE---------------------------#
     def move(self, direction):
-        print("Direction", direction)
-        if direction == "n":
-            data = {"direction": "n"}
-        if direction == "s":
-            data = {"direction": "s"}
-        if direction == "e":
-            data = {"direction": "e"}
-        if direction == "w":
-            data = {"direction": "w"}
+        print(f'Direction: {direction}')
+        endpoint = "/adv/move/"
+        data = {"direction": direction}
         res = requests.post(
-            'https://lambda-treasure-hunt.herokuapp.com/api/adv/move/', headers=headers, data=json.dumps(data)
+            self.base_url + endpoint,
+            headers=headers,
+            data=json.dumps(data)
         )
-
         next_room = json.loads(res.text)
         self.current_room = next_room
         print(f'{next_room} Here is our new room.')
 
     def wise_move(self, direction, room):
         print(f'Direction: {direction} Room: {room}')
-        if direction == "n":
-            data = {"direction": "n", "next_room": room}
-        if direction == "s":
-            data = {"direction": "s", "next_room": room}
-        if direction == "e":
-            data = {"direction": "e", "next_room": room}
-        if direction == "w":
-            data = {"direction": "w", "next_room": room}
+        endpoint = "/adv/move/"
+        data = {
+            "direction": direction,
+            "next_room": room
+        }
         res = requests.post(
-            'https://lambda-treasure-hunt.herokuapp.com/api/adv/move/', headers=headers, data=json.dumps(data)
+            self.base_url + endpoint,
+            headers=headers,
+            data=json.dumps(data)
         )
-
         next_room = json.loads(res.text)
         self.current_room = next_room
         print(f'{next_room} Here is our new room.')
 
 #---------------------------STATUS AND EXAMINE---------------------------#
     def status(self):
-        res = requests.post(
-            'https://lambda-treasure-hunt.herokuapp.com/api/adv/status/', headers=headers)
+        endpoint = "/adv/status/"
+        res = requests.post(self.base_url + endpoint, headers=headers)
         print(f'------- {res.text} STATUS')
 
     def examine(self):
+        endpoint = "/adv/examine/"
         data = {"name": "Wishing Well"}
         res = requests.post(
-            'https://lambda-treasure-hunt.herokuapp.com/api/adv/examine/', headers=headers, data=json.dumps(data)
+            self.base_url + endpoint,
+            headers=headers,
+            data=json.dumps(data)
         )
         print(f'------- {res.text} WISHING WELL INFO')
 
@@ -124,8 +140,11 @@ class Player:
         print(f'------- {res.text} CHANGE NAME')
 
 #---------------------------FAST MOVE---------------------------#
+#     def dash(self, direction, number_of_rooms, sequential_room_ids):
+#         data = {"direction":"n", "num_rooms":"5", "next_room_ids":"10,19,20,63,72"
+# }
 
 
 jason = Player("Jason", 0)
 
-jason.change_name("Jason")
+jason.init()
