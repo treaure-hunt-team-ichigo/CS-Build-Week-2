@@ -9,6 +9,20 @@ headers = {
     'Content-Type': 'application/json'
 }
 
+# Globals
+
+
+def parseRoom(res):
+    data = json.loads(res)
+    rm = {
+        'id': data['room_id'],
+        'coords': data['coordinates'],
+        'exits': data['exits'],
+        'cd': data['cooldown']
+    }
+    print(rm)
+    return rm
+
 
 class Player:
     def __init__(self, name, starting_room):
@@ -19,9 +33,8 @@ class Player:
         res = requests.get(
             'https://lambda-treasure-hunt.herokuapp.com/api/adv/init/', headers=headers
         )
-        data = json.loads(res.text)
-        print(f'type of: {type(data)}')
-        print(data['room_id'])
+        parseRoom(res.text)
+     
 
 
 #---------------------------TREASURE---------------------------#
@@ -69,6 +82,7 @@ class Player:
         res = requests.post(
             'https://lambda-treasure-hunt.herokuapp.com/api/adv/move/', headers=headers, data=json.dumps(data)
         )
+        
 
     def wise_move(self, direction, room):
         print(f'Direction: {direction} Room: {room}')
