@@ -119,7 +119,15 @@ class Player:
         )
         print(f'------- {res.text} UNDRESS')
 
+#---------------------------NAME CHANGER---------------------------#
+    def change_name(self, name):
+        data = {"name": name}
+        res = requests.post(
+            'https://lambda-treasure-hunt.herokuapp.com/api/adv/change_name/', headers=headers, data=json.dumps(data)
+        )
+        print(f'------- {res.text} CHANGE NAME')
+
 
 jason = Player("Jason", 0)
 
-jason.undress("shoe")
+jason.change_name("Jason")
