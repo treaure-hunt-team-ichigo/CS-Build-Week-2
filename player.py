@@ -44,6 +44,13 @@ class Player:
         )
         print(f'------- {res.text} SELL TREASURE')
 
+    def sell_confirm(self):
+        data = {"name": "treasure", "confirm": "yes"}
+        res = requests.post(
+            'https://lambda-treasure-hunt.herokuapp.com/api/adv/sell/', headers=headers, data=json.dumps(data)
+        )
+        print(f'------- {res.text} SELL CONFIRM TREASURE')
+
 #---------------------------MOVE---------------------------#
 
     def move(self, direction):
@@ -81,4 +88,4 @@ class Player:
 
 jason = Player("Jason", 0)
 
-jason.sell()
+jason.sell_confirm()
