@@ -89,7 +89,37 @@ class Player:
         self.current_room = next_room
         print(f'{next_room} Here is our new room.')
 
+#---------------------------STATUS AND EXAMINE---------------------------#
+
+    def status(self):
+        res = requests.post(
+            'https://lambda-treasure-hunt.herokuapp.com/api/adv/status/', headers=headers)
+        print(f'------- {res.text} STATUS')
+
+    def examine(self):
+        data = {"name": "Wishing Well"}
+        res = requests.post(
+            'https://lambda-treasure-hunt.herokuapp.com/api/adv/examine/', headers=headers, data=json.dumps(data)
+        )
+        print(f'------- {res.text} WISHING WELL INFO')
+
+#---------------------------EQUIPMENT (WEAR AND UNDRESS)---------------------------#
+
+    def wear(self, item):
+        data = {"name": item}
+        res = requests.post(
+            'https://lambda-treasure-hunt.herokuapp.com/api/adv/wear/', headers=headers, data=json.dumps(data)
+        )
+        print(f'------- {res.text} WEAR')
+
+    def undress(self, item):
+        data = {"name": item}
+        res = requests.post(
+            'https://lambda-treasure-hunt.herokuapp.com/api/adv/undress/', headers=headers, data=json.dumps(data)
+        )
+        print(f'------- {res.text} UNDRESS')
+
 
 jason = Player("Jason", 0)
 
-jason.wise_move("s", 0)
+jason.undress("shoe")
