@@ -9,8 +9,6 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-# Globals
-
 
 def parseRoom(res):
     data = json.loads(res)
@@ -18,8 +16,14 @@ def parseRoom(res):
         'id': data['room_id'],
         'coords': data['coordinates'],
         'exits': data['exits'],
-        'cd': data['cooldown']
+        'elevation': data['elevation'],
+        'terrain': data['terrain'],
+        'cd': data['cooldown'],
+        'description': data['description'],
+        'title': data['title'],
+        'items': data['items'],
     }
+    
     print(rm)
     return rm
 
@@ -96,13 +100,9 @@ class Player:
             headers=headers,
             data=json.dumps(data)
         )
-<<<<<<< HEAD
-        
-=======
         next_room = json.loads(res.text)
         self.current_room = next_room
         print(f'{next_room} Here is our new room.')
->>>>>>> ac044a83a0d429524a6b90efa025b14e4fada19d
 
     def wise_move(self, direction, room):
         print(f'Direction: {direction} Room: {room}')
@@ -167,8 +167,4 @@ class Player:
 
 phade = Player("Phade", 0)
 
-<<<<<<< HEAD
 phade.init()
-=======
-jason.init()
->>>>>>> ac044a83a0d429524a6b90efa025b14e4fada19d
