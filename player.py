@@ -12,6 +12,7 @@ headers = {
 
 def parseRoom(res):
     data = json.loads(res)
+    
     rm = {
         'id': data['room_id'],
         'coords': data['coordinates'],
@@ -22,8 +23,14 @@ def parseRoom(res):
         'description': data['description'],
         'title': data['title'],
         'items': data['items'],
+        'itf': False,
+        'iCnt': None,
     }
     
+    rm['iCnt'] = len(rm['items'])
+    if rm['iCnt'] > 0:
+        rm['itf'] = True
+            
     print(rm)
     return rm
 
@@ -41,8 +48,7 @@ class Player:
             self.base_url + endpoint,
             headers=headers
         )
-        parseRoom(res.text)
-     
+        parseRoom(res.text)     
 
 
 #---------------------------TREASURE---------------------------#
