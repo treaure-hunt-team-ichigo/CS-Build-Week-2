@@ -189,7 +189,19 @@ class Player:
         )
         print(f'------- {res.text} FLY')
 
+#---------------------------TELEPORTAION---------------------------#
+    def warp(self):
+        endpoint = "/adv/warp/"
+        res = requests.post(
+            self.base_url + endpoint,
+            headers=headers
+        )
+        print(f'------- {res.text} WARP')
 
-jason = Player("Jason", 0)
-
-jason.init()
+    def recall(self):
+        endpoint = "/adv/recall/"
+        res = requests.post(
+            self.base_url + endpoint,
+            headers=headers
+        )
+        print(f'------- {res.text} RECALL')
