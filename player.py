@@ -67,6 +67,10 @@ class Player:
             'https://lambda-treasure-hunt.herokuapp.com/api/adv/move/', headers=headers, data=json.dumps(data)
         )
 
+        next_room = json.loads(res.text)
+        self.current_room = next_room
+        print(f'{next_room} Here is our new room.')
+
     def wise_move(self, direction, room):
         print(f'Direction: {direction} Room: {room}')
         if direction == "n":
@@ -88,4 +92,4 @@ class Player:
 
 jason = Player("Jason", 0)
 
-jason.sell_confirm()
+jason.wise_move("s", 0)
