@@ -22,7 +22,6 @@ class Player:
         print(res.text)
 
 #---------------------------TREASURE---------------------------#
-
     def take(self):
         data = {"name": "treasure"}
         res = requests.post(
@@ -52,7 +51,6 @@ class Player:
         print(f'------- {res.text} SELL CONFIRM TREASURE')
 
 #---------------------------MOVE---------------------------#
-
     def move(self, direction):
         print("Direction", direction)
         if direction == "n":
@@ -90,7 +88,6 @@ class Player:
         print(f'{next_room} Here is our new room.')
 
 #---------------------------STATUS AND EXAMINE---------------------------#
-
     def status(self):
         res = requests.post(
             'https://lambda-treasure-hunt.herokuapp.com/api/adv/status/', headers=headers)
@@ -104,7 +101,6 @@ class Player:
         print(f'------- {res.text} WISHING WELL INFO')
 
 #---------------------------EQUIPMENT (WEAR AND UNDRESS)---------------------------#
-
     def wear(self, item):
         data = {"name": item}
         res = requests.post(
@@ -126,6 +122,8 @@ class Player:
             'https://lambda-treasure-hunt.herokuapp.com/api/adv/change_name/', headers=headers, data=json.dumps(data)
         )
         print(f'------- {res.text} CHANGE NAME')
+
+#---------------------------FAST MOVE---------------------------#
 
 
 jason = Player("Jason", 0)
