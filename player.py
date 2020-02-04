@@ -19,8 +19,7 @@ class Player:
         res = requests.get(
             'https://lambda-treasure-hunt.herokuapp.com/api/adv/init/', headers=headers
         )
-        res = res.text
-        data = json.loads(res)
+        data = json.loads(res.text)
         print(f'type of: {type(data)}')
         print(data['room_id'])
 
