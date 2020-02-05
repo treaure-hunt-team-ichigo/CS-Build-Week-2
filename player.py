@@ -304,3 +304,4 @@ class Player:
         # Parse Lambda Coin balance data
         self.lc_balance = json.loads(res.text)
         self.cd = self.lc_balance['cooldown']  # Get cooldown
+
