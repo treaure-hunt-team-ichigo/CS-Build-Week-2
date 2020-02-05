@@ -9,30 +9,31 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-
 def parseRoom(res):
-    data = json.loads(res)
+    data = json.loads(res)    
     
     rm = {
-        'id': data['room_id'],
-        'coords': data['coordinates'],
-        'exits': data['exits'],
-        'elevation': data['elevation'],
-        'terrain': data['terrain'],
-        'cd': data['cooldown'],
-        'description': data['description'],
-        'title': data['title'],
-        'items': data['items'],
-        'itf': False,
-        'iCnt': None,
+            'id': data['room_id'],
+            'coords': data['coordinates'],
+            'exits': data['exits'],
+            'elevation': data['elevation'],
+            'terrain': data['terrain'],
+            'cd': data['cooldown'],
+            'description': data['description'],
+            'title': data['title'],
+            'items': data['items'],
+            'itf': False,
+            'iCnt': None,
     }
     
     rm['iCnt'] = len(rm['items'])
+    
     if rm['iCnt'] > 0:
         rm['itf'] = True
-            
-    print(rm)
+    
+    # print(rm)       
     return rm
+
 
 
 class Player:
@@ -48,7 +49,7 @@ class Player:
             self.base_url + endpoint,
             headers=headers
         )
-        parseRoom(res.text)     
+        self.first_room = parseRoom(res.text)
 
 
 #---------------------------TREASURE---------------------------#
@@ -106,6 +107,7 @@ class Player:
             headers=headers,
             data=json.dumps(data)
         )
+        self.parseRoom(res.text)
         next_room = json.loads(res.text)
         self.current_room = next_room
         print(f'{next_room} Here is our new room.')
@@ -164,6 +166,9 @@ class Player:
             'https://lambda-treasure-hunt.herokuapp.com/api/adv/change_name/', headers=headers, data=json.dumps(data)
         )
         print(f'------- {res.text} CHANGE NAME')
+        
+
+
 
 #---------------------------FAST MOVE---------------------------#
 #     def dash(self, direction, number_of_rooms, sequential_room_ids):
@@ -171,6 +176,6 @@ class Player:
 # }
 
 
-phade = Player("Phade", 0)
+# phade = Player("Phade", 0)
 
-phade.init()
+# phade.init()
