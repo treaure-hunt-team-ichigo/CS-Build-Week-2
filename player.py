@@ -1,10 +1,10 @@
 import requests
 import json
 import time
-# from decouple import config
+from decouple import config
 
-# auth_key = config('api_key')
-auth_key = "Token 25064e5e6056d2c785295da3e30c023b138b70db"
+auth_key = config('api_key')
+# auth_key = "Token 25064e5e6056d2c785295da3e30c023b138b70db"
 
 headers = {
     'Authorization': auth_key,
@@ -17,7 +17,7 @@ class Player:
         self.current_room = starting_room
         self.base_url = "https://lambda-treasure-hunt.herokuapp.com/api"        
     
-        #---------------------------PARSED DATA CLASS VARIABLES---------------------------#            
+        #---------------------------SERVER RESPONSE DATA CLASS VARIABLES---------------------------#            
         self.cd = None                          # Cooldown          
         self.lc_balance = None                  # Lambda Coin balance         
         self.lc_mining = None                   # Lambda Coin mining data          
