@@ -10,10 +10,7 @@ print(phade.room)
 time.sleep(1)
 phade.move('e')
 
-
 print(phade.room)
-
-# time.sleep(15)
 
 for k, v in phade.room.items():
     print(f'{k}: {v}')
