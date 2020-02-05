@@ -7,7 +7,6 @@ auth_key = config('api_key')
 
 headers = {'Authorization': auth_key, 'Content-Type': 'application/json'}
 
-
 class Player:
     def __init__(self, name, starting_room):
         self.name = name
