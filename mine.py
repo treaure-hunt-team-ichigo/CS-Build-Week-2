@@ -5,8 +5,8 @@ from time import time
 
 DIFFICULTY = 3
 
-def proof(block):
-    block_string = json.dumps(block, sort_keys=True)    
+def proof(lvp):
+    block_string = json.dumps(lvp, sort_keys=True)    
     proof = 0    
     while valid_proof(block_string, proof) is False:
         proof += 1   
@@ -20,10 +20,6 @@ def valid_proof(block_string, proof):
 
 block = {
   "proof": 123456,
-  "difficulty": 8,
-  "cooldown": 1.0,
-  "messages": [],
-  "errors": []
 }
 
 print('Finding a new proof')

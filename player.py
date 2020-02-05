@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+from mine import proof
 from decouple import config
 
 auth_key = config('api_key')
@@ -43,7 +44,7 @@ class Player:
         self.room = json.loads(res.text)  # Parse room data
         self.cd = self.room['cooldown']  # Get cooldown
 
-        if self.room['error']:
+        if self.room['errors']:
             print(self.room['errors'])
         else:
             print(self.room['messages'])
@@ -277,9 +278,13 @@ class Player:
 
 #---------------------------LAMBDA COINS---------------------------#
 
-    def mine(self, proof):
+    def mine(self, new_proof):
         endpoint = '/bc/mine/'
-        res = requests.post(self.base_url + endpoint, headers=headers)
+        data = {'proof': new_proof}
+        res = requests.post(
+            self.base_url + endpoint, 
+            headers=headers,
+            data=json.dumps(data))
 
         self.lc_mining = json.loads(res.text)  # Parse mining data
         self.cd = self.lc_mining['cooldown']  # Get cooldown

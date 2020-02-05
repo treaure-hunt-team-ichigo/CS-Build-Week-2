@@ -1,6 +1,4 @@
 {
   "python.pythonPath": "/Users/phade/Projects/Python/CS-Build-Week-2/.venv/bin/python3.8",
-  "python.linting.pylintEnabled": true,
-  "python.linting.enabled": true,
-  "python.formatting.provider": "yapf"
+  "python.linting.pylintEnabled": true
 }
