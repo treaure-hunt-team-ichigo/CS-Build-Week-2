@@ -45,7 +45,7 @@ exits = player.room['exits']
 
 # when player moves room in a specific direction
 # TODO: player_graph[player.current_room.id] = {i: "?" for i in exits}
-player_graph[player.room['id']] = {i: "?" for i in exits}
+player_graph[player.room['room_id']] = {i: "?" for i in exits}
 
 # visiting every room on map at least once
 while len(player_graph) < 500:
@@ -53,7 +53,7 @@ while len(player_graph) < 500:
     direction = None
 
     # TODO: ud = unexplored_directions(player_graph, player.current_room.id)
-    ud = unexplored_directions(player_graph, player.room['id'])
+    ud = unexplored_directions(player_graph, player.room['room_id'])
 
     # TODO: if len(player.current_room.get_exits()) == 1:
     if len(player.room['exits']) == 1:
@@ -69,26 +69,26 @@ while len(player_graph) < 500:
     elif len(ud) == 0:
         nr = find_unexplored_room(player_graph)
         # TODO: path = bfs(player, player.current_room.id, nr, player_graph)
-        path = bfs(player, player.room['id'], nr, player_graph)
+        path = bfs(player, player.room['room_id'], nr, player_graph)
         path = path[1:]
         while len(path) > 0:
             next_room = path.pop(0)
             direction = find_room_direction(
                 # TODO: player_graph[player.current_room.id], next_room)
-                player_graph[player.room['id']], next_room)
+                player_graph[player.room['room_id']], next_room)
             if len(path) > 0:
                 # TODO: previous_room = player.current_room.id
-                previous_room = player.room['id']
+                previous_room = player.room['room_id']
                 # TODO: player.travel(direction)
                 player.move(direction)
                 time.sleep(cool_down)
                 traversal_path.append(direction)
                 # TODO: visited_rooms_list.append(player.current_room.id)
-                visited_rooms_list.append(player.room['id'])
+                visited_rooms_list.append(player.room['room_id'])
 
     if direction is None:
         # TODO: for key, value in player_graph[player.current_room.id].items():
-        for key, value in player_graph[player.room['id']].items():
+        for key, value in player_graph[player.room['room_id']].items():
             if (key in ["n", "s", "e", "w"]) and (value == "?"):
                 direction = key
                 break
@@ -101,21 +101,21 @@ while len(player_graph) < 500:
     time.sleep(cool_down)
     traversal_path.append(direction)
     # TODO: visited_rooms_list.append(player.current_room.id)
-    visited_rooms_list.append(player.room['id'])
+    visited_rooms_list.append(player.room['room_id'])
 
     # TODO: player_graph[previous_room][direction] = player.current_room.id
-    player_graph[previous_room][direction] = player.room['id']
+    player_graph[previous_room][direction] = player.room['room_id']
     # TODO: new_exits = player.current_room.get_exits()
     new_exits = player.room['exits']
 
     # TODO: if player.current_room.id not in player_graph.keys():
-    if player.room['id'] not in player_graph.keys():
+    if player.room['room_id'] not in player_graph.keys():
         # TODO: player_graph[player.current_room.id] = {i: "?" for i in new_exits}
-        player_graph[player.room['id']] = {i: "?" for i in new_exits}
+        player_graph[player.room['room_id']] = {i: "?" for i in new_exits}
 
     try:
         # TODO: player_graph[player.current_room.id][opposite_map[direction]
-        player_graph[player.room['id']
+        player_graph[player.room['room_id']
                      ][opposite_map[direction]] = previous_room
     except:
         pass
