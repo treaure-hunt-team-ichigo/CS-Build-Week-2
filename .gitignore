@@ -1,6 +1,9 @@
 # local files
 notes/
-
+.vscode/
+.venv/
+adv_bp.py
+util_bp.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
