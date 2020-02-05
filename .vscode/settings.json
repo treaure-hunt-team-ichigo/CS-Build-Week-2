@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "C:\\Users\\jason\\.virtualenvs\\CS-Build-Week-2-gERizsRj\\Scripts\\python.exe",
+  "python.pythonPath": ".venv/bin/python",
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
   "python.formatting.provider": "yapf"
