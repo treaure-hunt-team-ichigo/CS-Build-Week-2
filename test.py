@@ -6,7 +6,7 @@ phade.init()
 
 # phade.move('n')
 
-rm = phade.first_room
+rm = phade.room_info
 
 print(rm['id'])
 

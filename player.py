@@ -35,7 +35,6 @@ def parseRoom(res):
     return rm
 
 
-
 class Player:
     def __init__(self, name, starting_room):
         self.name = name
