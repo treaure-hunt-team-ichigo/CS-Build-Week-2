@@ -9,6 +9,7 @@ headers = {
     'Content-Type': 'application/json'
 }
 
+
 #-----------------------------------SERVER RESPONSE PARSING----------------------------------------#
 
 def parseBalance(res):
@@ -22,6 +23,19 @@ def parseBalance(res):
     
     return bal
 
+def parseMine(res):
+    data = json.loads(res)
+    
+    mine = {
+        'cd': data['cooldown'],                 # Cooldown
+        'desc': data['description'],            # Description of player when attempting to mine
+        'err': data['errors'],                  # Generated error messages
+        'msgs': data['messages'],               # Generated messages
+        'name': data['name']                    # Player name        
+    }
+    
+    return mine
+
 def parsePlayer(res): # Get player inventory / status data
     data = json.loads(res)
     
@@ -33,14 +47,27 @@ def parsePlayer(res): # Get player inventory / status data
         'feet': data['footwear'],               # Footwear
         'gold': data['gold'],                   # Player gold
         'inv': data['inventory'],               # Inventory
-        'msgs': data['messages']                # Generated messages
+        'msgs': data['messages'],               # Generated messages
         'name': data['name'],                   # Player name 
         'spd': data['speed'],                   # How fast do you travel?
         'status': data['status'],               # Player status
-        'str': data['strength'],                # How much can you carry?
+        'str': data['strength']                 # How much can you carry?
     }
     
     return status
+
+def parseProof(res): # Get last valid proof (lvp) data
+    data = json.loads(res)
+    
+    lvp = {
+        'cd': data['cooldown'],                 # Cooldown
+        'dl': data['difficulty'],               # Difficulty lvl
+        'err': data['errors'],                  # Generated error messages
+        'msgs': data['messages'],               # Generated messages
+        'proof': data['proof']                  # Proof 
+    }
+    
+    return lvp
 
 def parseRoom(res): # Get room data
     data = json.loads(res)    
@@ -50,15 +77,15 @@ def parseRoom(res): # Get room data
         'coords': data['coordinates'],          # Room coordinates
         'description': data['description'],     # Room description
         'elevation': data['elevation'],         # Room elevation
-        'err': data['errors']                   # Generated error messages
+        'err': data['errors'],                  # Generated error messages
         'exits': data['exits'],                 # Room exits
         'id': data['room_id'],                  # Room ID
-        'items': data['items'],                 # Items in room
-        'itf': False,                           # Items in room: true/false
+        'items': data['items'],                 # Items found in room
+        'itf': False,                           # Room has items: true/false
         'iCnt': None,                           # Number of items in room
-        'msgs': data['messages']                # Generated messages
-        'terrain': data['terrain'],             # Room's terrain
-        'title': data['title'],                 # Room title
+        'msgs': data['messages'],               # Generated messages
+        'terrain': data['terrain'],             # Room terrain
+        'title': data['title']                  # Room title
     }
     
     rm['iCnt'] = len(rm['items'])
@@ -75,17 +102,27 @@ class Player:
     def __init__(self, name, starting_room):
         self.name = name
         self.current_room = starting_room
-        self.base_url = "https://lambda-treasure-hunt.herokuapp.com/api"
+        self.base_url = "https://lambda-treasure-hunt.herokuapp.com/api"        
+    
+        #---------------------------PARSED DATA CLASS VARIABLES---------------------------#            
+        # Lambda Coin balance
+        self.lc_balance = None
         
-    #---------------------------PARSED DATA VARIABLES---------------------------#            
-    # Cooldown
-    self.cd = None
-    
-    # Room data 
-    self.room = None
-    
-    # Player status  
-    self.status = None
+        # Cooldown
+        self.cd = None
+        
+        # Lambda Coin mining data
+        self.lc_mining = None
+        
+        # Lambda Coin last valid proof
+        self.lc_proof = None
+        
+        # Room data 
+        self.room = None
+        
+        # Player status  
+        self.p_status = None
+
 
 #---------------------------INIT---------------------------#
     def init(self):
@@ -94,7 +131,10 @@ class Player:
             self.base_url + endpoint,
             headers=headers
         )
-        self.room = parseRoom(res.text)
+        
+        self.room = parseRoom(res.text)             # Parse room data
+        self.cd = self.room['cd']                   # Get cooldown
+
 
 #---------------------------TREASURE---------------------------#
     def take(self):
@@ -108,6 +148,14 @@ class Player:
             data=json.dumps(data)
         )
         print(f'------- {res.text} TAKING TREASURE')
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
+        
+        if self.room['err']:
+            print(self.room['err']) 
+        else:
+            print(self.room['msgs'])
 
     def drop(self):
         endpoint = "/adv/drop/"
@@ -120,6 +168,14 @@ class Player:
             data=json.dumps(data)
         )
         print(f'------- {res.text} DROPPING TREASURE')
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
+        
+        if self.room['err']:
+            print(self.room['err']) 
+        else:
+            print(self.room['msgs'])
 
     def sell(self):
         endpoint = "/adv/sell/"
@@ -132,6 +188,14 @@ class Player:
             data=json.dumps(data)
         )
         print(f'------- {res.text} SELL TREASURE')
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
+        
+        if self.room['err']:
+            print(self.room['err']) 
+        else:
+            print(self.room['msgs'])
 
     def sell_confirm(self):
         endpoint = "/adv/sell/"
@@ -145,6 +209,15 @@ class Player:
             data=json.dumps(data)
         )
         print(f'------- {res.text} SELL CONFIRM TREASURE')
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
+        
+        if self.room['err']:
+            print(self.room['err']) 
+        else:
+            print(self.room['msgs'])
+
 
 #---------------------------MOVE---------------------------#
     def move(self, direction):
@@ -159,8 +232,8 @@ class Player:
             data=json.dumps(data)
         )
         next_room = json.loads(res.text)
-        self.current_room = next_room
-        print(f'{next_room} Here is our new room.')
+        # self.current_room = next_room
+        # print(f'{next_room} Here is our new room.')
         
         self.room = parseRoom(res.text)                 # Parse room data
         self.cd = self.room['cd']                       # Get cooldown 
@@ -181,7 +254,44 @@ class Player:
         self.current_room = next_room
         print(f'{next_room} Here is our new room.')
         
-        self.room = parseRoom(res.text)
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
+        
+        
+#---------------------------CARRY AND RECEIVE---------------------------#
+    def carry(self, item):
+        endpoint = '/adv/carry/'
+        data = {
+            'name': item
+        }
+        res = requests.post(
+            self.base_url + endpoint,
+            headers=headers
+        )
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
+        
+        if self.room['err']:
+            print(self.room['err']) 
+        else:
+            print(self.room['msgs'])
+             
+    def receive(self):
+        endpoint = '/adv/receive/'
+        res = requests.post(
+            self.base_url + endpoint,
+            headers=headers
+        )
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
+        
+        if self.room['err']:
+            print(self.room['err']) 
+        else:
+            print(self.room['msgs'])
+            
 
 #---------------------------STATUS AND EXAMINE---------------------------#
     def status(self):
@@ -192,7 +302,8 @@ class Player:
         )
         print(f'------- {res.text} STATUS')
         
-        self.status = parsePlayer(res.text)     # Parses player status data into self.status
+        self.status = parseStatus(res.text)             # Parse player data
+        self.cd = self.status['cd']                     # Get cooldown
 
     def examine(self):
         endpoint = "/adv/examine/"
@@ -205,6 +316,7 @@ class Player:
             data=json.dumps(data)
         )
         print(f'------- {res.text} WISHING WELL INFO')
+        
 
 #---------------------------EQUIPMENT (WEAR AND UNDRESS)---------------------------#
     def wear(self, item):
@@ -216,6 +328,14 @@ class Player:
             data=json.dumps(data)
         )
         print(f'------- {res.text} WEAR')
+        
+        self.status = parseStatus(res.text)             # Parse player data
+        self.cd = self.status['cd']                     # Get cooldown  
+        
+        if self.status['err']:
+            print(self.room['err']) 
+        else:
+            print(self.room['msgs'])      
 
     def undress(self, item):
         endpoint = "/adv/undress/"
@@ -226,6 +346,15 @@ class Player:
             data=json.dumps(data)
         )
         print(f'------- {res.text} UNDRESS')
+        
+        self.status = parseStatus(res.text)             # Parse player data
+        self.cd = self.status['cd']                     # Get cooldown  
+        
+        if self.status['err']:
+            print(self.room['err']) 
+        else:
+            print(self.room['msgs']) 
+        
 
 #---------------------------NAME CHANGER---------------------------#
     def change_name(self, name):
@@ -255,6 +384,9 @@ class Player:
             data=json.dumps(data)
         )
         print(f'------- {res.text} DASH')
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
 
     def flight(self, direction):
         endpoint = "/adv/fly/"
@@ -267,6 +399,10 @@ class Player:
             data=json.dumps(data)
         )
         print(f'------- {res.text} FLY')
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
+        
 
 #---------------------------TELEPORTAION---------------------------#
     def warp(self):
@@ -276,6 +412,9 @@ class Player:
             headers=headers
         )
         print(f'------- {res.text} WARP')
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
 
     def recall(self):
         endpoint = "/adv/recall/"
@@ -284,3 +423,61 @@ class Player:
             headers=headers
         )
         print(f'------- {res.text} RECALL')
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown
+        
+        
+#---------------------------TRANSMOGRIFY---------------------------#
+    def transmogrify(self, item):
+        endpoint = '/adv/transmogrify/'
+        res = requests.post(
+            self.base_url + endpoint,
+            headers=headers
+        )
+        
+        self.room = parseRoom(res.text)                 # Parse room data
+        self.cd = self.room['cd']                       # Get cooldown  
+        
+        if self.room['err']:
+            print(self.room['err']) 
+        else:
+            print(self.room['msgs'])
+            
+    
+#---------------------------LAMBDA COINS---------------------------#
+    def mine(self, proof):
+        endpoint = '/bc/mine/'
+        res = requests.post(
+            self.base_url + endpoint,
+            headers=headers
+        )
+        
+        self.lc_mining = parseMine(res.text)             # Parse mining data
+        self.cd = self.lc_mining['cd']                   # Get cooldown
+        
+        if self.lc_mining['err']:
+            print(self.lc_mining['err']) 
+        else:
+            print(self.lc_mining['msgs'])
+            
+    def proof(self):
+        endpoint = '/bc/last_proof/'
+        res = requests.get(
+            self.base_url + endpoint,
+            headers=headers
+        )
+        
+        self.lc_proof = parseProof(res.text)             # Parse last valid proof data
+        self.cd = self.lc_proof['cd']                    # Get cooldown
+        
+    def balance(self):
+        endpoint = '/bc/get_balance'
+        res = requests.get(
+            self.base_url + endpoint,
+            headers=headers
+        )
+        
+        self.lc_balance = parseBalance(res.text)         # Parse Lambda Coin balance data
+        self.cd = self.lc_balance['cd']                  # Get cooldown
+        
