@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "/Users/phade/Projects/Python/CS-Build-Week-2/.venv/bin/python3.8",
+  "python.pythonPath": "C:\\Program Files (x86)\\Python38-32\\python.exe",
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true
 }
