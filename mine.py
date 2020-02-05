@@ -1,11 +1,33 @@
 import hashlib
 import json
+from player import Player
 from time import time
 
-def hash(block):
-    string_object = json.dumps(block, sort_keys=True).encode()
-    raw_hash = hashlib.sha256(string_object)
-    hex_hash = raw_hash.hexdigest()
-    
-    return hex_hash
+DIFFICULTY = 3
 
+def proof(block):
+    block_string = json.dumps(block, sort_keys=True)    
+    proof = 0    
+    while valid_proof(block_string, proof) is False:
+        proof += 1   
+    return proof
+
+def valid_proof(block_string, proof):
+    guess = f'{block_string}{proof}'.encode()
+    guess_hash = hashlib.sha256(guess).hexdigest()
+    
+    return guess_hash[:DIFFICULTY] == '0' * DIFFICULTY
+
+block = {
+  "proof": 123456,
+  "difficulty": 8,
+  "cooldown": 1.0,
+  "messages": [],
+  "errors": []
+}
+
+print('Finding a new proof')
+
+new_proof = proof(block)
+
+print(new_proof)
