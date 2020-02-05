@@ -12,7 +12,7 @@ headers = {
 
 #-----------------------------------SERVER RESPONSE PARSING----------------------------------------#
 
-def parseBalance(res):
+def parseBalance(res):                          # Parse Lambda Coin balance data
     data = json.loads(res)
     
     bal = {
@@ -23,7 +23,7 @@ def parseBalance(res):
     
     return bal
 
-def parseMine(res):
+def parseMine(res):                             # Parse Lambda Coin mining data
     data = json.loads(res)
     
     mine = {
@@ -36,7 +36,7 @@ def parseMine(res):
     
     return mine
 
-def parsePlayer(res): # Get player inventory / status data
+def parsePlayer(res):                           # Parse player inventory / status data
     data = json.loads(res)
     
     status = {
@@ -56,7 +56,7 @@ def parsePlayer(res): # Get player inventory / status data
     
     return status
 
-def parseProof(res): # Get last valid proof (lvp) data
+def parseProof(res):                            # Parse Lambda Coin last valid proof (lvp) data
     data = json.loads(res)
     
     lvp = {
@@ -69,7 +69,7 @@ def parseProof(res): # Get last valid proof (lvp) data
     
     return lvp
 
-def parseRoom(res): # Get room data
+def parseRoom(res):                             # Parse room data
     data = json.loads(res)    
     
     rm = {
@@ -105,23 +105,12 @@ class Player:
         self.base_url = "https://lambda-treasure-hunt.herokuapp.com/api"        
     
         #---------------------------PARSED DATA CLASS VARIABLES---------------------------#            
-        # Lambda Coin balance
-        self.lc_balance = None
-        
-        # Cooldown
-        self.cd = None
-        
-        # Lambda Coin mining data
-        self.lc_mining = None
-        
-        # Lambda Coin last valid proof
-        self.lc_proof = None
-        
-        # Room data 
-        self.room = None
-        
-        # Player status  
-        self.p_status = None
+        self.lc_balance = None                  # Lambda Coin balance         
+        self.cd = None                          # Cooldown          
+        self.lc_mining = None                   # Lambda Coin mining data          
+        self.lc_proof = None                    # Lambda Coin last valid proof           
+        self.room = None                        # Room data           
+        self.p_status = None                    # Player status 
 
 
 #---------------------------INIT---------------------------#
