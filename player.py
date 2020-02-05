@@ -1,11 +1,12 @@
 import requests
 import json
 import time
+from decouple import config
 
-jason_clemons_api_key = "Token 25064e5e6056d2c785295da3e30c023b138b70db"
+auth_key = config('api_key')
 
 headers = {
-    'Authorization': jason_clemons_api_key,
+    'Authorization': auth_key,
     'Content-Type': 'application/json'
 }
 
@@ -37,12 +38,13 @@ def parseMine(res):                             # Parse Lambda Coin mining data
     return mine
 
 def parsePlayer(res):                           # Parse player inventory / status data
-    data = json.loads(res)
+    data = json.loads(res) 
+    print(f'****Player data: {data}')           
     
     status = {
         'body': data['bodywear'],               # Bodywear 
         'cd': data['cooldown'],                 # Cooldown
-        'encumbbrance': data['encumbrance'],    # How much are you carrying?
+        'encumbrance': data['encumbrance'],     # How much are you carrying?
         'err': data['errors'],                  # Generated error messages
         'feet': data['footwear'],               # Footwear
         'gold': data['gold'],                   # Player gold
@@ -291,8 +293,8 @@ class Player:
         )
         print(f'------- {res.text} STATUS')
         
-        self.status = parseStatus(res.text)             # Parse player data
-        self.cd = self.status['cd']                     # Get cooldown
+        self.p_status = parsePlayer(res.text)             # Parse player data
+        self.cd = self.p_status['cd']                     # Get cooldown
 
     def examine(self):
         endpoint = "/adv/examine/"
@@ -318,8 +320,8 @@ class Player:
         )
         print(f'------- {res.text} WEAR')
         
-        self.status = parseStatus(res.text)             # Parse player data
-        self.cd = self.status['cd']                     # Get cooldown  
+        self.p_status = parsePlayer(res.text)             # Parse player data
+        self.cd = self.p_status['cd']                     # Get cooldown  
         
         if self.status['err']:
             print(self.room['err']) 
@@ -336,8 +338,8 @@ class Player:
         )
         print(f'------- {res.text} UNDRESS')
         
-        self.status = parseStatus(res.text)             # Parse player data
-        self.cd = self.status['cd']                     # Get cooldown  
+        self.p_status = parsePlayer(res.text)             # Parse player data
+        self.cd = self.p_status['cd']                     # Get cooldown  
         
         if self.status['err']:
             print(self.room['err']) 
