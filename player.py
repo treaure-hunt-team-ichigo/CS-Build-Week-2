@@ -1,472 +1,368 @@
 import requests
 import json
 import time
+from decouple import config
+import time
 
-jason_clemons_api_key = "Token 25064e5e6056d2c785295da3e30c023b138b70db"
-
-headers = {
-    'Authorization': jason_clemons_api_key,
-    'Content-Type': 'application/json'
-}
+auth_key = config("api_key")
 
 
-#-----------------------------------SERVER RESPONSE PARSING----------------------------------------#
+headers = {"Authorization": auth_key, "Content-Type": "application/json"}
 
-def parseBalance(res):                          # Parse Lambda Coin balance data
+
+# -----------------------------------SERVER RESPONSE PARSING----------------------------------------#
+
+
+def parseBalance(res):  # Parse Lambda Coin balance data
     data = json.loads(res)
-    
+
     bal = {
-        'cd': data['cooldown'],                 # Cooldown 
-        'err': data['errors'],                  # Generated error messages
-        'msgs': data['messages']                # Generated messages
+        "cd": data["cooldown"],  # Cooldown
+        "err": data["errors"],  # Generated error messages
+        "msgs": data["messages"],  # Generated messages
     }
-    
+
     return bal
 
-def parseMine(res):                             # Parse Lambda Coin mining data
+
+def parseMine(res):  # Parse Lambda Coin mining data
     data = json.loads(res)
-    
+
     mine = {
-        'cd': data['cooldown'],                 # Cooldown
-        'desc': data['description'],            # Description of player when attempting to mine
-        'err': data['errors'],                  # Generated error messages
-        'msgs': data['messages'],               # Generated messages
-        'name': data['name']                    # Player name        
+        "cd": data["cooldown"],  # Cooldown
+        "desc": data["description"],  # Description of player when attempting to mine
+        "err": data["errors"],  # Generated error messages
+        "msgs": data["messages"],  # Generated messages
+        "name": data["name"],  # Player name
     }
-    
+
     return mine
 
-def parsePlayer(res):                           # Parse player inventory / status data
+
+def parsePlayer(res):  # Parse player inventory / status data
     data = json.loads(res)
-    
+
     status = {
-        'body': data['bodywear'],               # Bodywear 
-        'cd': data['cooldown'],                 # Cooldown
-        'encumbbrance': data['encumbrance'],    # How much are you carrying?
-        'err': data['errors'],                  # Generated error messages
-        'feet': data['footwear'],               # Footwear
-        'gold': data['gold'],                   # Player gold
-        'inv': data['inventory'],               # Inventory
-        'msgs': data['messages'],               # Generated messages
-        'name': data['name'],                   # Player name 
-        'spd': data['speed'],                   # How fast do you travel?
-        'status': data['status'],               # Player status
-        'str': data['strength']                 # How much can you carry?
+        "body": data["bodywear"],  # Bodywear
+        "cd": data["cooldown"],  # Cooldown
+        "encumbbrance": data["encumbrance"],  # How much are you carrying?
+        "err": data["errors"],  # Generated error messages
+        "feet": data["footwear"],  # Footwear
+        "gold": data["gold"],  # Player gold
+        "inv": data["inventory"],  # Inventory
+        "msgs": data["messages"],  # Generated messages
+        "name": data["name"],  # Player name
+        "spd": data["speed"],  # How fast do you travel?
+        "status": data["status"],  # Player status
+        "str": data["strength"],  # How much can you carry?
     }
-    
+
     return status
 
-def parseProof(res):                            # Parse Lambda Coin last valid proof (lvp) data
+
+def parseProof(res):  # Parse Lambda Coin last valid proof (lvp) data
     data = json.loads(res)
-    
+
     lvp = {
-        'cd': data['cooldown'],                 # Cooldown
-        'dl': data['difficulty'],               # Difficulty lvl
-        'err': data['errors'],                  # Generated error messages
-        'msgs': data['messages'],               # Generated messages
-        'proof': data['proof']                  # Proof 
+        "cd": data["cooldown"],  # Cooldown
+        "dl": data["difficulty"],  # Difficulty lvl
+        "err": data["errors"],  # Generated error messages
+        "msgs": data["messages"],  # Generated messages
+        "proof": data["proof"],  # Proof
     }
-    
+
     return lvp
 
-def parseRoom(res):                             # Parse room data
-    data = json.loads(res)    
-    
+
+def parseRoom(res):  # Parse room data
+    data = json.loads(res)
+
     rm = {
-        'cd': data['cooldown'],                 # Cooldown
-        'coords': data['coordinates'],          # Room coordinates
-        'description': data['description'],     # Room description
-        'elevation': data['elevation'],         # Room elevation
-        'err': data['errors'],                  # Generated error messages
-        'exits': data['exits'],                 # Room exits
-        'id': data['room_id'],                  # Room ID
-        'items': data['items'],                 # Items found in room
-        'itf': False,                           # Room has items: true/false
-        'iCnt': None,                           # Number of items in room
-        'msgs': data['messages'],               # Generated messages
-        'terrain': data['terrain'],             # Room terrain
-        'title': data['title']                  # Room title
+        "cd": data["cooldown"],  # Cooldown
+        "coords": data["coordinates"],  # Room coordinates
+        "description": data["description"],  # Room description
+        "elevation": data["elevation"],  # Room elevation
+        "err": data["errors"],  # Generated error messages
+        "exits": data["exits"],  # Room exits
+        "id": data["room_id"],  # Room ID
+        "items": data["items"],  # Items found in room
+        "itf": False,  # Room has items: true/false
+        "iCnt": None,  # Number of items in room
+        "msgs": data["messages"],  # Generated messages
+        "terrain": data["terrain"],  # Room terrain
+        "title": data["title"],  # Room title
     }
-    
-    rm['iCnt'] = len(rm['items'])
-    
-    if rm['iCnt'] > 0:
-        rm['itf'] = True
+
+    rm["iCnt"] = len(rm["items"])
+
+    if rm["iCnt"] > 0:
+        rm["itf"] = True
     else:
-        rm['itf'] = False
-          
+        rm["itf"] = False
+
     return rm
 
 
 class Player:
-    def __init__(self, name, starting_room):
+    def __init__(self, name):
         self.name = name
-        self.current_room = starting_room
-        self.base_url = "https://lambda-treasure-hunt.herokuapp.com/api"        
-    
-        #---------------------------PARSED DATA CLASS VARIABLES---------------------------#            
-        self.lc_balance = None                  # Lambda Coin balance         
-        self.cd = None                          # Cooldown          
-        self.lc_mining = None                   # Lambda Coin mining data          
-        self.lc_proof = None                    # Lambda Coin last valid proof           
-        self.room = None                        # Room data           
-        self.p_status = None                    # Player status 
+        self.current_room = None
+        self.room = None  # Room data
+        self.rooms = {}
+        self.room_grid = []
+        self.visited_rooms_graph = {}
+        self.grid_size = 0
+        self.base_url = "https://lambda-treasure-hunt.herokuapp.com/api"
 
+        # ---------------------------PARSED DATA CLASS VARIABLES---------------------------#
+        self.lc_balance = None  # Lambda Coin balance
+        self.cd = None  # Cooldown
+        self.lc_mining = None  # Lambda Coin mining data
+        self.lc_proof = None  # Lambda Coin last valid proof
 
-#---------------------------INIT---------------------------#
+        self.p_status = None  # Player status
+        self.init = self.init()
+
+    # ---------------------------INIT---------------------------#
     def init(self):
         endpoint = "/adv/init/"
-        res = requests.get(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        
-        self.room = parseRoom(res.text)             # Parse room data
-        self.cd = self.room['cd']                   # Get cooldown
+        res = requests.get(self.base_url + endpoint, headers=headers)
 
+        self.room = parseRoom(res.text)  # Parse room data
+        self.current_room = parseRoom(res.text)
+        self.cd = self.room["cd"]  # Get cooldown
 
-#---------------------------TREASURE---------------------------#
+    # ---------------------------TREASURE---------------------------#
     def take(self):
         endpoint = "/adv/take/"
-        data = {
-            "name": "treasure"
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} TAKING TREASURE')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
-        
-        if self.room['err']:
-            print(self.room['err']) 
+        data = {"name": "treasure"}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} TAKING TREASURE")
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+        if self.room["err"]:
+            print(self.room["err"])
         else:
-            print(self.room['msgs'])
+            print(self.room["msgs"])
 
     def drop(self):
         endpoint = "/adv/drop/"
-        data = {
-            "name": "treasure"
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} DROPPING TREASURE')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
-        
-        if self.room['err']:
-            print(self.room['err']) 
+        data = {"name": "treasure"}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} DROPPING TREASURE")
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+        if self.room["err"]:
+            print(self.room["err"])
         else:
-            print(self.room['msgs'])
+            print(self.room["msgs"])
 
     def sell(self):
         endpoint = "/adv/sell/"
-        data = {
-            "name": "treasure"
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} SELL TREASURE')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
-        
-        if self.room['err']:
-            print(self.room['err']) 
+        data = {"name": "treasure"}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} SELL TREASURE")
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+        if self.room["err"]:
+            print(self.room["err"])
         else:
-            print(self.room['msgs'])
+            print(self.room["msgs"])
 
     def sell_confirm(self):
         endpoint = "/adv/sell/"
-        data = {
-            "name": "treasure",
-            "confirm": "yes"
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} SELL CONFIRM TREASURE')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
-        
-        if self.room['err']:
-            print(self.room['err']) 
+        data = {"name": "treasure", "confirm": "yes"}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} SELL CONFIRM TREASURE")
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+        if self.room["err"]:
+            print(self.room["err"])
         else:
-            print(self.room['msgs'])
+            print(self.room["msgs"])
 
-
-#---------------------------MOVE---------------------------#
+    # ---------------------------MOVE---------------------------#
     def move(self, direction):
-        print(f'Direction: {direction}')
+        time.sleep(self.cd)
+        print("Cooldown: {self.cd}")
+        print(f"Direction: {direction}")
         endpoint = "/adv/move/"
-        data = {
-            "direction": direction
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
+        data = {"direction": direction}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
         next_room = json.loads(res.text)
-        # self.current_room = next_room
-        # print(f'{next_room} Here is our new room.')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown 
+        print(res.text)
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
 
     def wise_move(self, direction, room):
-        print(f'Direction: {direction} Room: {room}')
+        print(f"Direction: {direction} Room: {room}")
         endpoint = "/adv/move/"
-        data = {
-            "direction": direction,
-            "next_room": room
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
+        data = {"direction": direction, "next_room": room}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
         next_room = json.loads(res.text)
         self.current_room = next_room
-        print(f'{next_room} Here is our new room.')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
-        
-        
-#---------------------------CARRY AND RECEIVE---------------------------#
-    def carry(self, item):
-        endpoint = '/adv/carry/'
-        data = {
-            'name': item
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
-        
-        if self.room['err']:
-            print(self.room['err']) 
-        else:
-            print(self.room['msgs'])
-             
-    def receive(self):
-        endpoint = '/adv/receive/'
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
-        
-        if self.room['err']:
-            print(self.room['err']) 
-        else:
-            print(self.room['msgs'])
-            
+        print(f"{next_room} Here is our new room.")
 
-#---------------------------STATUS AND EXAMINE---------------------------#
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+    # ---------------------------CARRY AND RECEIVE---------------------------#
+    def carry(self, item):
+        endpoint = "/adv/carry/"
+        data = {"name": item}
+        res = requests.post(self.base_url + endpoint, headers=headers)
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+        if self.room["err"]:
+            print(self.room["err"])
+        else:
+            print(self.room["msgs"])
+
+    def receive(self):
+        endpoint = "/adv/receive/"
+        res = requests.post(self.base_url + endpoint, headers=headers)
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+        if self.room["err"]:
+            print(self.room["err"])
+        else:
+            print(self.room["msgs"])
+
+    # ---------------------------STATUS AND EXAMINE---------------------------#
     def status(self):
         endpoint = "/adv/status/"
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        print(f'------- {res.text} STATUS')
-        
-        self.status = parseStatus(res.text)             # Parse player data
-        self.cd = self.status['cd']                     # Get cooldown
+        res = requests.post(self.base_url + endpoint, headers=headers)
+        print(f"------- {res.text} STATUS")
+
+        self.p_status = parsePlayer(res.text)  # Parse player data
+        self.cd = self.p_status["cd"]  # Get cooldown
 
     def examine(self):
         endpoint = "/adv/examine/"
-        data = {
-            "name": "Wishing Well"
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} WISHING WELL INFO')
-        
+        data = {"name": "Wishing Well"}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} WISHING WELL INFO")
 
-#---------------------------EQUIPMENT (WEAR AND UNDRESS)---------------------------#
+    # ---------------------------EQUIPMENT (WEAR AND UNDRESS)---------------------------#
     def wear(self, item):
         endpoint = "/adv/wear/"
         data = {"name": item}
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} WEAR')
-        
-        self.status = parseStatus(res.text)             # Parse player data
-        self.cd = self.status['cd']                     # Get cooldown  
-        
-        if self.status['err']:
-            print(self.room['err']) 
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} WEAR")
+
+        self.p_status = parsePlayer(res.text)  # Parse player data
+        self.cd = self.p_status["cd"]  # Get cooldown
+
+        if self.p_status["err"]:
+            print(self.room["err"])
         else:
-            print(self.room['msgs'])      
+            print(self.room["msgs"])
 
     def undress(self, item):
         endpoint = "/adv/undress/"
         data = {"name": item}
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} UNDRESS')
-        
-        self.status = parseStatus(res.text)             # Parse player data
-        self.cd = self.status['cd']                     # Get cooldown  
-        
-        if self.status['err']:
-            print(self.room['err']) 
-        else:
-            print(self.room['msgs']) 
-        
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} UNDRESS")
 
-#---------------------------NAME CHANGER---------------------------#
+        self.p_status = parsePlayer(res.text)  # Parse player data
+        self.cd = self.p_status["cd"]  # Get cooldown
+
+        if self.p_status["err"]:
+            print(self.room["err"])
+        else:
+            print(self.room["msgs"])
+
+    # ---------------------------NAME CHANGER---------------------------#
     def change_name(self, name):
         endpoint = "/adv/change_name/"
-        data = {
-            "name": name
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} CHANGE NAME')
+        data = {"name": name}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} CHANGE NAME")
 
-
-#---------------------------FAST MOVE---------------------------#
+    # ---------------------------FAST MOVE---------------------------#
     def dash(self, direction, number_of_rooms, sequential_room_ids):
         endpoint = "/adv/dash/"
-        data = {
-            "direction": direction,
-            "num_rooms": number_of_rooms,
-            "next_room_ids": sequential_room_ids
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} DASH')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
+        data = {"direction": direction, "num_rooms": number_of_rooms, "next_room_ids": sequential_room_ids}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} DASH")
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
 
     def flight(self, direction):
         endpoint = "/adv/fly/"
-        data = {
-            "direction": direction
-        }
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers,
-            data=json.dumps(data)
-        )
-        print(f'------- {res.text} FLY')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
-        
+        data = {"direction": direction}
+        res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
+        print(f"------- {res.text} FLY")
 
-#---------------------------TELEPORTAION---------------------------#
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+    # ---------------------------TELEPORTAION---------------------------#
     def warp(self):
         endpoint = "/adv/warp/"
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        print(f'------- {res.text} WARP')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
+        res = requests.post(self.base_url + endpoint, headers=headers)
+        print(f"------- {res.text} WARP")
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
 
     def recall(self):
         endpoint = "/adv/recall/"
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        print(f'------- {res.text} RECALL')
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown
-        
-        
-#---------------------------TRANSMOGRIFY---------------------------#
+        res = requests.post(self.base_url + endpoint, headers=headers)
+        print(f"------- {res.text} RECALL")
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+    # ---------------------------TRANSMOGRIFY---------------------------#
     def transmogrify(self, item):
-        endpoint = '/adv/transmogrify/'
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        
-        self.room = parseRoom(res.text)                 # Parse room data
-        self.cd = self.room['cd']                       # Get cooldown  
-        
-        if self.room['err']:
-            print(self.room['err']) 
+        endpoint = "/adv/transmogrify/"
+        res = requests.post(self.base_url + endpoint, headers=headers)
+
+        self.room = parseRoom(res.text)  # Parse room data
+        self.cd = self.room["cd"]  # Get cooldown
+
+        if self.room["err"]:
+            print(self.room["err"])
         else:
-            print(self.room['msgs'])
-            
-    
-#---------------------------LAMBDA COINS---------------------------#
+            print(self.room["msgs"])
+
+    # ---------------------------LAMBDA COINS---------------------------#
     def mine(self, proof):
-        endpoint = '/bc/mine/'
-        res = requests.post(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        
-        self.lc_mining = parseMine(res.text)             # Parse mining data
-        self.cd = self.lc_mining['cd']                   # Get cooldown
-        
-        if self.lc_mining['err']:
-            print(self.lc_mining['err']) 
+        endpoint = "/bc/mine/"
+        res = requests.post(self.base_url + endpoint, headers=headers)
+
+        self.lc_mining = parseMine(res.text)  # Parse mining data
+        self.cd = self.lc_mining["cd"]  # Get cooldown
+
+        if self.lc_mining["err"]:
+            print(self.lc_mining["err"])
         else:
-            print(self.lc_mining['msgs'])
-            
+            print(self.lc_mining["msgs"])
+
     def proof(self):
-        endpoint = '/bc/last_proof/'
-        res = requests.get(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        
-        self.lc_proof = parseProof(res.text)             # Parse last valid proof data
-        self.cd = self.lc_proof['cd']                    # Get cooldown
-        
+        endpoint = "/bc/last_proof/"
+        res = requests.get(self.base_url + endpoint, headers=headers)
+
+        self.lc_proof = parseProof(res.text)  # Parse last valid proof data
+        self.cd = self.lc_proof["cd"]  # Get cooldown
+
     def balance(self):
-        endpoint = '/bc/get_balance'
-        res = requests.get(
-            self.base_url + endpoint,
-            headers=headers
-        )
-        
-        self.lc_balance = parseBalance(res.text)         # Parse Lambda Coin balance data
-        self.cd = self.lc_balance['cd']                  # Get cooldown
-        
+        endpoint = "/bc/get_balance"
+        res = requests.get(self.base_url + endpoint, headers=headers)
+
+        self.lc_balance = parseBalance(res.text)  # Parse Lambda Coin balance data
+        self.cd = self.lc_balance["cd"]  # Get cooldown
