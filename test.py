@@ -11,14 +11,14 @@ for k, v in phade.room.items():
 time.sleep(2)
 
 phade.move('w')
- 
+
 print(phade.room['room_id'])
 
 print(f'COOLDOWN: {phade.cd}')
 
 time.sleep(phade.cd)
 
-phade.status()  
+phade.status()
 
 print(phade.p_status['speed'])
 
