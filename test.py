@@ -22,12 +22,7 @@ phade.status()
 
 print(phade.p_status['speed'])
 
-# f = open('test.txt', 'a')
-# f.write(phade.room)
-# f.close()
 
-# f = open('test.txt', 'r')
-# print(f.read()) 
 
 
 

@@ -5,7 +5,6 @@ from decouple import config
 
 auth_key = config('api_key')
 
-
 headers = {
     'Authorization': auth_key,
     'Content-Type': 'application/json'
