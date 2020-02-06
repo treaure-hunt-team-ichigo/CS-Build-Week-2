@@ -1,4 +1,5 @@
 from player import Player
+import json
 import random
 import time
 
@@ -6,6 +7,7 @@ player = Player('Name', 0)
 player.init()
 time.sleep(player.cd)
 graph = dict()
+mapped = []
 traversal_path = []
 reverse_path = []
 visited_rooms = set()
@@ -51,8 +53,12 @@ def dfs(room, cardinal_directions):
     else:
         graph[previous_room_id][cardinal_direction] = in_room_id
 
+rm_txt = open('rooms.txt', 'w+')
+
 while len(graph) < 500:
-    print(graph)
+    # print(graph)
+    mapped.append(player.room)
+    rm_txt.write(player.room)
     print(player.room)
     in_room = player.room
     if in_room['room_id'] not in graph:
@@ -71,3 +77,9 @@ while len(graph) < 500:
             choice = random.choice(exits)
             player.move(choice)
             time.sleep(player.cd)
+
+rm_txt.close
+mapped_json=json.dumps(mapped)
+f = open('mapped.txt', 'w+')
+f.write(mapped_json)
+f.close
