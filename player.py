@@ -100,7 +100,6 @@ class Player:
 #---------------------------MOVE---------------------------#
 
     def move(self, direction):
-        print(f'Direction: {direction}')
         endpoint = "/adv/move/"
         data = {"direction": direction}
         res = requests.post(self.base_url + endpoint,
