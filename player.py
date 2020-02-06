@@ -3,6 +3,7 @@ import json
 import time
 from decouple import config
 import time
+import ast
 
 auth_key = config("api_key")
 
@@ -103,12 +104,20 @@ def parseRoom(res):  # Parse room data
     return rm
 
 
+visited_rooms_graph = "files/visited_rooms_graph.json"
+rooms_file = "files/rooms_graph.json"
+visited_rooms_track = "files/visited_rooms_track.json"
+directions = ["n", "e", "s", "w"]
+opposite_directions = {"n": "s", "e": "w", "s": "n", "w": "e"}
+
+
 class Player:
     def __init__(self, name):
         self.name = name
         self.current_room = None
         self.room = None  # Room data
         self.rooms = {}
+        self.visited_rooms_track = None
         self.room_grid = []
         self.visited_rooms_graph = {}
         self.grid_size = 0
@@ -125,12 +134,48 @@ class Player:
 
     # ---------------------------INIT---------------------------#
     def init(self):
+        # load graph
+        self.visited_rooms_graph = ast.literal_eval(open(visited_rooms_graph, "r").read())
+
+        # load rooms set
+        self.visited_rooms_track = ast.literal_eval(open(visited_rooms_track, "r").read())
+
+        # rooms graph file
+        self.rooms = ast.literal_eval(open(rooms_file, "r").read())
+
         endpoint = "/adv/init/"
         res = requests.get(self.base_url + endpoint, headers=headers)
 
         self.room = parseRoom(res.text)  # Parse room data
         self.current_room = parseRoom(res.text)
         self.cd = self.room["cd"]  # Get cooldown
+        # rooms dict
+        keys = ["coords", "description", "elevation", "err", "exits", "id", "terrain", "title"]
+        self.rooms[self.room["id"]] = {k: v for (k, v) in self.room.items() if k in keys}
+
+    def write(self):
+        # visited_rooms_graph = "files/visited_rooms_graph2.json"
+        # rooms_file = "files/rooms_graph.json"
+        # visited_rooms_track = "files/visited_rooms_track.json"
+        # g = player.visited_rooms_graph
+        # j = json.dumps(g)
+        # f = open(visited_rooms_graph, "w")
+        # f.write(j)
+        # f.close()
+        with open(visited_rooms_graph, "w") as f:
+            f.write(str(self.visited_rooms_graph))
+
+        r = self.rooms
+        k = json.dumps(r)
+        f = open(rooms_file, "w")
+        f.write(k)
+        f.close()
+
+        # with open(rooms_file, "w") as f:
+        #     f.write(str(self.rooms))
+
+        with open(visited_rooms_track, "w") as f:
+            f.write(str(self.visited_rooms_track))
 
     # ---------------------------TREASURE---------------------------#
     def take(self):
@@ -191,28 +236,51 @@ class Player:
 
     # ---------------------------MOVE---------------------------#
     def move(self, direction):
-        time.sleep(self.cd)
-        print("Cooldown: {self.cd}")
+        self.status()
+        print(f"Cooldown: {self.cd}")
         print(f"Direction: {direction}")
+        time.sleep(self.cd)
+        try:
+            check_map = self.visited_rooms_graph[self.room["id"]][direction]
+            print(f"check_map: {check_map}")
+            if check_map == "?":
+                self.move_blind(direction)
+                print("move_blind")
+            else:
+                self.wise_move(direction, check_map)
+                print("wise_move")
+        except KeyError:
+            print("not an known exit direction")
+
+        # self.cd = self.room["cd"]  # Get cooldown
+        self.write()
+
+    def move_blind(self, direction):
+        # self.status()
+        # time.sleep(self.cd)
+        # check_map = self.visited_rooms_graph[self.room["id"]][next_move]
+        # print("Cooldown: {self.cd}")
+        # print(f"Direction: {direction}")
         endpoint = "/adv/move/"
         data = {"direction": direction}
         res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
         next_room = json.loads(res.text)
-        print(res.text)
+        # print(res.text)
         self.room = parseRoom(res.text)  # Parse room data
-        self.cd = self.room["cd"]  # Get cooldown
+        # self.cd = self.room["cd"]  # Get cooldown
+        # self.write()
 
     def wise_move(self, direction, room):
-        print(f"Direction: {direction} Room: {room}")
+        # print(f"Direction: {direction} Room: {room}")
         endpoint = "/adv/move/"
         data = {"direction": direction, "next_room": room}
         res = requests.post(self.base_url + endpoint, headers=headers, data=json.dumps(data))
-        next_room = json.loads(res.text)
-        self.current_room = next_room
-        print(f"{next_room} Here is our new room.")
+        # next_room = json.loads(res.text)
+        # self.current_room = next_room
+        # print(f"{next_room} Here is our new room.")
 
         self.room = parseRoom(res.text)  # Parse room data
-        self.cd = self.room["cd"]  # Get cooldown
+        # self.cd = self.room["cd"]  # Get cooldown
 
     # ---------------------------CARRY AND RECEIVE---------------------------#
     def carry(self, item):
@@ -244,7 +312,7 @@ class Player:
     def status(self):
         endpoint = "/adv/status/"
         res = requests.post(self.base_url + endpoint, headers=headers)
-        print(f"------- {res.text} STATUS")
+        # print(f"------- {res.text} STATUS")
 
         self.p_status = parsePlayer(res.text)  # Parse player data
         self.cd = self.p_status["cd"]  # Get cooldown

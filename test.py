@@ -5,18 +5,17 @@ from util_bp import Stack, Queue
 
 player = Player("Bryant")
 
-map_file = "player.visited_rooms_graph.json"
 
 # Loads the map into a dictionary
-room_graph = literal_eval(open(map_file, "r").read())
-world.load_graph(room_graph)
+# room_graph = literal_eval(open(map_file, "r").read())
+# world.load_graph(room_graph)
 
 
 def add_to_visited_rooms(visited_rooms_graph, room):
     if room["id"] not in visited_rooms_graph:
         exits = room["exits"]
         current_exits = visited_rooms_graph[room["id"]] = {exit: "?" for exit in exits}
-        visited_rooms_track.add(room["id"])
+        player.visited_rooms_track.add(room["id"])
         return current_exits
 
 
@@ -63,7 +62,7 @@ def visit_rooms():
         traversal_path.append(next_move)
         player.move(next_move)
         room = player.room
-        if player.room["id"] not in visited_rooms_track:
+        if player.room["id"] not in player.visited_rooms_track:
             add_to_visited_rooms(player.visited_rooms_graph, player.room)
 
         if room["id"] not in player.visited_rooms_graph:
@@ -78,12 +77,12 @@ traversal_path = []
 directions = ["n", "e", "s", "w"]
 opposite_directions = {"n": "s", "e": "w", "s": "n", "w": "e"}
 
-visited_rooms_track = set()
-visit_rooms()
-d = player.visited_rooms_graph
-import json
+# player.visited_rooms_track = set()
+# visit_rooms()
+# d = player.visited_rooms_graph
+# import json
 
-json = json.dumps(d)
-f = open("player.visited_rooms_graph.json", "w")
-f.write(json)
-f.close()
+# json = json.dumps(d)
+# f = open("player.visited_rooms_graph.json", "w")
+# f.write(json)
+# f.close()
