@@ -45,6 +45,7 @@ def visit_rooms():
             travel_path = new_path(player.visited_rooms_graph, room)
             next_move = travel_path.dequeue()
             next_move = next_move[0]
+        print(f"visited rooms: {len(player.visited_rooms_graph)}")
         player.move(next_move)
 
 

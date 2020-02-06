@@ -3,9 +3,9 @@ notes/
 .vscode/
 .venv/
 src/
-files_backup/
+files_backup2/
 adv_bp.py
-
+aws/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
