@@ -69,7 +69,7 @@ def name_change(self):
         player.status()
         time.sleep(player.cd)
         if player.p_status['gold'] > 999:
-            player.change_name("Jason_Prince")
+            player.change_name("Phade")
             time.sleep(player.cd)
 
 rm_txt = open('rooms.txt', 'w+')
