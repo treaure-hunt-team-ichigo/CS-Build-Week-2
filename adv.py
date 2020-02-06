@@ -58,7 +58,8 @@ rm_txt = open('rooms.txt', 'w+')
 while len(graph) < 500:
     # print(graph)
     mapped.append(player.room)
-    rm_txt.write(player.room)
+    rm_json = json.dumps(player.room)
+    rm_txt.write(rm_json)
     print(player.room)
     in_room = player.room
     if in_room['room_id'] not in graph:
