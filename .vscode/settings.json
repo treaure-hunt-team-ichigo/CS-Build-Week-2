@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
   "python.pythonPath": "C:\\Users\\jason\\.virtualenvs\\testing-qhXsmph0\\Scripts\\python.exe",
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
   "python.formatting.provider": "yapf"
+=======
+  "python.pythonPath": "/Users/phade/Projects/Python/CS-Build-Week-2/.venv/bin/python3.8",
+  "python.linting.pylintEnabled": true
+>>>>>>> 7f104f3ba7261f086f896c55533903e285fa50ed
 }

@@ -5,22 +5,15 @@ phade = Player("Phade", 0)
 
 phade.init()
 
-for k, v in phade.room.items():
-    print(f'{k}: {v}')
+print(phade.room['room_id'])
 
-time.sleep(2)
+time.sleep(1)
 
-phade.move('w')
+phade.move('s')
 
 print(phade.room['room_id'])
 
-print(f'COOLDOWN: {phade.cd}')
 
-time.sleep(phade.cd)
-
-phade.status()
-
-print(phade.p_status['speed'])
 
 
 
