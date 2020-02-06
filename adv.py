@@ -80,7 +80,4 @@ while len(graph) < 500:
             time.sleep(player.cd)
 
 rm_txt.close
-mapped_json=json.dumps(mapped)
-f = open('mapped.txt', 'w+')
-f.write(mapped_json)
-f.close
+
