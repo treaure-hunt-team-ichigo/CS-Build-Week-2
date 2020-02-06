@@ -56,8 +56,13 @@ def dfs(room, cardinal_directions):
 
 def take_treasure(self):
     if len(player.room['items']) > 0:
-        player.take()
+        player.status()
         time.sleep(player.cd)
+        if len(player.p_status['inventory']) < player.p_status['strength']:
+            player.take()
+            time.sleep(player.cd)
+        else:
+            print('Inventory is full')
 
 def sell_treasure(self):
     if player.room['title'] == "Shop":
@@ -71,6 +76,8 @@ def name_change(self):
         if player.p_status['gold'] > 999:
             player.change_name("Phade")
             time.sleep(player.cd)
+        else:
+            print('You are broke, no name change for you..')
 
 rm_txt = open('rooms.txt', 'w+')
 
