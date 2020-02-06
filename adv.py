@@ -1,4 +1,5 @@
 from player import Player
+import json
 import random
 import time
 
@@ -6,6 +7,7 @@ player = Player('Name', 0)
 player.init()
 time.sleep(player.cd)
 graph = dict()
+mapped = []
 traversal_path = []
 reverse_path = []
 visited_rooms = set()
@@ -94,7 +96,6 @@ while len(graph) < 500:
             choice = random.choice(exits)
             player.move(choice)
             time.sleep(player.cd)
-
 
 # collect items
 # sell items

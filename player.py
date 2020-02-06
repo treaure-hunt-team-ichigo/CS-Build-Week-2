@@ -1,7 +1,6 @@
 import requests
 import json
 import time
-from mine import proof
 from decouple import config
 
 auth_key = config('api_key')
