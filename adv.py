@@ -51,9 +51,32 @@ def dfs(room, cardinal_directions):
     else:
         graph[previous_room_id][cardinal_direction] = in_room_id
 
+
+def take_treasure(self):
+    if len(player.room['items']) > 0:
+        player.take()
+        time.sleep(player.cd)
+
+def sell_treasure(self):
+    if player.room['title'] == "Shop":
+        player.sell()
+        time.sleep(player.cd)
+
+def name_change(self):
+    if player.room['title'] == "Pirate Ry's":
+        player.status()
+        time.sleep(player.cd)
+        if player.p_status['gold'] > 999:
+            player.change_name("Jason_Prince")
+            time.sleep(player.cd)
+
+
 while len(graph) < 500:
     print(graph)
-    print(player.room)
+    # print(player.room)
+    take_treasure(player.room)
+    sell_treasure(player.room)
+    name_change(player.room)
     in_room = player.room
     if in_room['room_id'] not in graph:
         populate_graph_with_exits(in_room)
@@ -71,3 +94,9 @@ while len(graph) < 500:
             choice = random.choice(exits)
             player.move(choice)
             time.sleep(player.cd)
+
+
+# collect items
+# sell items
+# change name
+# mine lambda coin
