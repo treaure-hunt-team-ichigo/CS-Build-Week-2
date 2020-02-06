@@ -76,7 +76,7 @@ rm_txt = open('rooms.txt', 'w+')
 
 while len(graph) < 500:
     # print(graph)
-    # print(player.room)
+    print(player.room['title']
     rm_json = json.dumps(player.room)
     rm_txt.write(rm_json)
     take_treasure(player.room)
