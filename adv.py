@@ -76,7 +76,7 @@ rm_txt = open('rooms.txt', 'w+')
 
 while len(graph) < 500:
     # print(graph)
-    print(f'room: {player.room['id']} - {player.room['title']}')
+    print(f'room: {player.room['room_id']} - {player.room['title']}')
     rm_json = json.dumps(player.room)
     rm_txt.write(rm_json)
     take_treasure(player.room)
