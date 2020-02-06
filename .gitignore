@@ -2,8 +2,10 @@
 notes/
 .vscode/
 .venv/
+src/
+files_backup/
 adv_bp.py
-util_bp.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
