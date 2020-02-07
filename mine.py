@@ -21,27 +21,26 @@ def valid_proof(bl_string, proof, difficulty):
 player = Player('Name', 0)
 player.init()
 time.sleep(player.cd)
+
 print('getting last valid proof')
 player.proof()
 time.sleep(player.cd)
+
 lvp = player.lc_proof['proof']
 dif = player.lc_proof['difficulty']
 proof = proof_of_work(lvp, dif)
 print('found proof: ', proof)
-player.mine(proof)
+
 print('submitting proof')
-mined = player.lc_mining
-if mined['errors']:
-    print(mined['errors'])
-else:
-    print(mined['messages'])
+player.mine(proof)
 time.sleep(player.cd)
+
 print('checking balance')    
 player.balance()
 time.sleep(player.cd)
 bal = player.lc_balance['messages']
 print(bal)
-time.sleep(player.cd)
+
 
     
     
