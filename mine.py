@@ -1,29 +1,47 @@
-import hashlib
 import json
-# from player import Player
-from time import time
+import hashlib
+import time
+from player import Player
 
-DIFFICULTY = 3
 
-def proof(lvp):
-    block_string = json.dumps(lvp, sort_keys=True)    
-    proof = 0    
-    while valid_proof(block_string, proof) is False:
-        proof += 1   
+
+def proof_of_work(last_block, difficulty):
+    bl_string = json.dumps(last_block, sort_keys=True)
+    proof = 0
+    while valid_proof(bl_string, proof, difficulty) is False:
+        proof += 1
     return proof
 
-def valid_proof(block_string, proof):
-    guess = f'{block_string}{proof}'.encode()
+def valid_proof(bl_string, proof, difficulty):
+    guess = f"{bl_string}{proof}".encode()
     guess_hash = hashlib.sha256(guess).hexdigest()
+    return guess_hash[:difficulty] == "0" * difficulty
+
+
+player = Player('Name', 0)
+player.init()
+time.sleep(player.cd)
+print('getting last valid proof')
+player.proof()
+time.sleep(player.cd)
+lvp = player.lc_proof['proof']
+dif = player.lc_proof['difficulty']
+proof = proof_of_work(lvp, dif)
+print('found proof: ', proof)
+player.mine(proof)
+print('submitting proof')
+mined = player.lc_mining
+if mined['errors']:
+    print(mined['errors'])
+else:
+    print(mined['messages'])
+time.sleep(player.cd)
+print('checking balance')    
+player.balance()
+time.sleep(player.cd)
+bal = player.lc_balance['messages']
+print(bal)
+time.sleep(player.cd)
+
     
-    return guess_hash[:DIFFICULTY] == '0' * DIFFICULTY
-
-block = {
-  "proof": 123456,
-}
-
-print('Finding a new proof')
-
-new_proof = proof(block)
-
-print(new_proof)
+    

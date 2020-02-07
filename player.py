@@ -1,9 +1,11 @@
 import requests
+import hashlib
 import json
 import time
-from decouple import config
+# from decouple import config
 
-auth_key = config('api_key')
+# auth_key = config('api_key')
+auth_key = 'Token 25064e5e6056d2c785295da3e30c023b138b70db'
 
 headers = {'Authorization': auth_key, 'Content-Type': 'application/json'}
 
@@ -308,3 +310,4 @@ class Player:
         self.lc_balance = json.loads(res.text)
         self.cd = self.lc_balance['cooldown']  # Get cooldown
 
+    
